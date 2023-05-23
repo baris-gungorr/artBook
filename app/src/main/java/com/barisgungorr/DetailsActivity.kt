@@ -1,8 +1,10 @@
 package com.barisgungorr
 
+import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.barisgungorr.artbook.R
 import com.barisgungorr.artbook.databinding.ActivityDetailsBinding
 
@@ -16,11 +18,12 @@ class DetailsActivity : AppCompatActivity() {
         setContentView(view)
     }
 
-    fun save (view: View) {
+    fun save(view: View) {
 
     }
+
     fun saveImage(view: View) {
 
-    }
 
+    }
 }
