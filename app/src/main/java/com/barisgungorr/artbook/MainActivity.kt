@@ -19,16 +19,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean { //Bağlama işlemi yapılacak
         val menuInflater = menuInflater
         menuInflater.inflate(R.menu.art_menu,menu)
 
         return super.onCreateOptionsMenu(menu)
 
-
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {  // Tıklandığında ne olacağını yapacağız
 
         if (item.itemId == R.id.add_art_item) {
             val intent = Intent(this@MainActivity,DetailsActivity::class.java)
@@ -38,8 +37,6 @@ class MainActivity : AppCompatActivity() {
 
         return super.onOptionsItemSelected(item)
     }
-
-
 
 
 }
