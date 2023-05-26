@@ -22,8 +22,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        artlist = ArrayList<Art>()
 
+        artlist = ArrayList<Art>()
         artAdapter = ArtAdapter(artlist)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = artAdapter
@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity() {
 
             }
             artAdapter.notifyDataSetChanged()
-
 
             cursor.close()
 

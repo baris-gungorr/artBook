@@ -47,7 +47,10 @@ class DetailsActivity : AppCompatActivity() {
             binding.artNameText.setText("")
             binding.artistNameText.setText("")
             binding.yearText.setText("")
-            binding.imageView.setImageResource(R.drawable.selectt)
+            binding.button.visibility = View.VISIBLE
+         //   binding.imageView.setImageResource(R.drawable.selectt)
+            val selectedImageBackground = BitmapFactory.decodeResource(applicationContext.resources,R.drawable.selectt)
+            binding.imageView.setImageBitmap(selectedImageBackground)
 
         }else {
             binding.button.visibility = View.INVISIBLE
@@ -118,60 +121,37 @@ class DetailsActivity : AppCompatActivity() {
     }
 
     fun saveImage(view: View) {  // görsele tıklandığında izin var mı yok mu onu kontrol ettiğimiz kısım
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_MEDIA_IMAGES
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        this,
-                        Manifest.permission.READ_MEDIA_IMAGES
-                    )
-                ) {
-                    Snackbar.make(view, "Galerine girelim mi ?", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("İzin ver (!)",
-                            View.OnClickListener {
-                                permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
-                            }).show()
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_MEDIA_IMAGES)) {
+                    Snackbar.make(view, "Permission needed for gallery", Snackbar.LENGTH_INDEFINITE).setAction("Give Permission",
+                        View.OnClickListener {
+                            permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                        }).show()
                 } else {
                     permissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
                 }
-
             } else {
-                val intentToGallery =
-                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                // intent ile bir aksiyon da yaptırabiliyoruz // galeriye git diyoruz
+                val intentToGallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 activityResultLauncher.launch(intentToGallery)
             }
-
         } else {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    )
-                ) {
-                    Snackbar.make(view, "Galerine girelim mi ?", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("İzin ver (!)", View.OnClickListener {
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    Snackbar.make(view, "Permission needed for gallery", Snackbar.LENGTH_INDEFINITE).setAction("Give Permission",
+                        View.OnClickListener {
                             permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                         }).show()
                 } else {
                     permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                 }
-
             } else {
-
-                val intentToGallery =
-                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                // intent ile bir aksiyon da yaptırabiliyoruz // galeriye git diyoruz
+                val intentToGallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 activityResultLauncher.launch(intentToGallery)
             }
         }
+
+
     }
 
     private fun registerLauncher() {
@@ -235,10 +215,8 @@ class DetailsActivity : AppCompatActivity() {
             width = scaledWidth.toInt()
         }
 
-        return Bitmap.createScaledBitmap(image,100,100,true)
+        return Bitmap.createScaledBitmap(image,width,height,true)
     }
-
-
 }
 
 

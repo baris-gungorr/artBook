@@ -8,13 +8,9 @@ import com.barisgungorr.artbook.databinding.ActivityDetailsBinding
 import com.barisgungorr.artbook.databinding.RecyclerRowBinding
 
 class ArtAdapter(val artList : ArrayList<Art>): RecyclerView.Adapter<ArtAdapter.ArtHolder>() {
-
 class ArtHolder(val binding: RecyclerRowBinding): RecyclerView.ViewHolder(binding.root) {
 
-
-
 }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtHolder {
        val binding = RecyclerRowBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return ArtHolder(binding)
