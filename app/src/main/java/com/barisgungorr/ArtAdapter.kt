@@ -28,6 +28,8 @@ class ArtHolder(val binding: RecyclerRowBinding): RecyclerView.ViewHolder(bindin
         holder.binding.recyclerViewTextView.text = artList.get(position).name
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context,DetailsActivity::class.java)
+            intent.putExtra("info","old")
+            intent.putExtra("id",artList.get(position).id)
             holder.itemView.context.startActivity(intent)
         }
     }
