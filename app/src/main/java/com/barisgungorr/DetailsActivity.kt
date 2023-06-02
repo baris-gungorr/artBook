@@ -1,7 +1,6 @@
 package com.barisgungorr
 
 import android.Manifest
-import android.app.DownloadManager.Request
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
@@ -9,14 +8,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.barisgungorr.artbook.MainActivity
@@ -47,39 +45,39 @@ class DetailsActivity : AppCompatActivity() {
             binding.artNameText.setText("")
             binding.artistNameText.setText("")
             binding.yearText.setText("")
-            binding.button.visibility = View.VISIBLE
-         //   binding.imageView.setImageResource(R.drawable.selectt)
-            val selectedImageBackground = BitmapFactory.decodeResource(applicationContext.resources,R.drawable.selectt)
+
+            binding.button.visibility = View.VISIBLE  // burada yeni bir veri
+
+         //  binding.imageView.setImageResource(R.drawable.selectt)
+            val selectedImageBackground = BitmapFactory.decodeResource(applicationContext.resources,R.drawable.selectimage)
             binding.imageView.setImageBitmap(selectedImageBackground)
 
         }else {
-            binding.button.visibility = View.INVISIBLE
+            binding.button.visibility = View.INVISIBLE // kaydet butonu gözükmez eski bir veri olduğu için
             val selectedId = intent.getIntExtra("id",1)
 
             val cursor = database.rawQuery("SELECT * FROM arts WHERE id = ?" , arrayOf(selectedId.toString()))
+          //  database.execSQL("DELETE FROM arts WHERE name = 4 ")
 
             val artNameIx = cursor.getColumnIndex("artname")
             val artistNameIx = cursor.getColumnIndex("artistname")
             val yearIx = cursor.getColumnIndex("year")
-            val ımageIx = cursor.getColumnIndex("image")
+            val imageIx =  cursor.getColumnIndex("image")
+
 
             while (cursor.moveToNext()) {
                 binding.artNameText.setText(cursor.getString(artNameIx))
                 binding.artistNameText.setText(cursor.getString(artistNameIx))
                 binding.yearText.setText(cursor.getString(yearIx))
 
-                val byteArray = cursor.getBlob(selectedId)
+                val byteArray = cursor.getBlob(imageIx)
                 val bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
                 binding.imageView.setImageBitmap(bitmap)
 
             }
             cursor.close()
 
-
-
         }
-
-
     }
 
     fun save(view: View) {
@@ -90,11 +88,12 @@ class DetailsActivity : AppCompatActivity() {
         if (selectedBitmap != null) {
             val smallBitMap = makeSmallerBitMap(selectedBitmap!!,300)
 
-            val outPutStream = ByteArrayOutputStream() // Bir görseli veriye çevirmek için kullanılır
-            smallBitMap.compress(Bitmap.CompressFormat.PNG,50,outPutStream)
+            val outPutStream = ByteArrayOutputStream()
+            smallBitMap.compress(Bitmap.CompressFormat.PNG,50,outPutStream)   //görseli byteDizisine çevirmek
             val byteArray = outPutStream.toByteArray()
 
             try {
+          //     val database = this.openOrCreateDatabase("Arts", MODE_PRIVATE,null)
                 database.execSQL("CREATE TABLE IF NOT EXISTS arts (id INTEGER PRIMARY KEY, artname VARCHAR, artistname VARCHAR, year VARCHAR, image BLOB)")
 
                 val sqlString = "INSERT INTO arts (artname, artistname, year, image) VALUES (?, ?, ?, ?)"
@@ -110,17 +109,15 @@ class DetailsActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
 
-
             val intent = Intent(this, MainActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) // açık olan aktivite varsa kapat diyoruz
 
             startActivity(intent)
-
 
         }
     }
 
-    fun saveImage(view: View) {  // görsele tıklandığında izin var mı yok mu onu kontrol ettiğimiz kısım
+    fun selectImage(view: View) {  // görsele tıklandığında izin var mı yok mu onu kontrol ettiğimiz kısım
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_MEDIA_IMAGES)) {
@@ -151,29 +148,22 @@ class DetailsActivity : AppCompatActivity() {
             }
         }
 
-
     }
 
     private fun registerLauncher() {
-        activityResultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     val intentFromResult = result.data
                     if (intentFromResult != null) {
                         val imageData = intentFromResult.data
+                     //   if (imageData !=null) {
                         try {
                             if (Build.VERSION.SDK_INT >= 28) {
-                                val source = ImageDecoder.createSource(
-                                    this@DetailsActivity.contentResolver,
-                                    imageData!!
-                                )
+                                val source = ImageDecoder.createSource(this@DetailsActivity.contentResolver, imageData!!)
                                 selectedBitmap = ImageDecoder.decodeBitmap(source)
                                 binding.imageView.setImageBitmap(selectedBitmap)
                             } else {
-                                selectedBitmap = MediaStore.Images.Media.getBitmap(
-                                    this@DetailsActivity.contentResolver,
-                                    imageData
-                                )
+                                selectedBitmap = MediaStore.Images.Media.getBitmap(this@DetailsActivity.contentResolver, imageData)
                                 binding.imageView.setImageBitmap(selectedBitmap)
                             }
                         } catch (e: IOException) {
@@ -182,17 +172,14 @@ class DetailsActivity : AppCompatActivity() {
                     }
                 }
             }
-        permissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
+        permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
                 if (result) {
                     //permission granted
-                    val intentToGallery =
-                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    val intentToGallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     activityResultLauncher.launch(intentToGallery)
                 } else {
                     //permission denied
-                    Toast.makeText(this@DetailsActivity, "Permisson needed!", Toast.LENGTH_LONG)
-                        .show()
+                    Toast.makeText(this@DetailsActivity, "Permisson needed!", Toast.LENGTH_LONG).show()
                 }
             }
     }
@@ -218,5 +205,20 @@ class DetailsActivity : AppCompatActivity() {
         return Bitmap.createScaledBitmap(image,width,height,true)
     }
 }
+/*
+1->makeSmallerBitMap adında bir özel fonksiyon tanımlanıyor. Bu fonksiyon, bir Bitmap nesnesi alacak ve küçültülmüş bir Bitmap döndürecek.
+2->image parametresi, işlem yapılacak orijinal Bitmap nesnesini temsil eder.
+3->maximumSize parametresi, hedeflenen maksimum boyutu belirtir. Küçültülen Bitmap, bu boyut sınırlamalarına uymak için yeniden boyutlandırılacaktır.
+4->width ve height değişkenleri, orijinal Bitmap'in genişlik ve yükseklik değerlerini tutmak için kullanılır.
+5->bitmapRatio değişkeni, orijinal Bitmap'in en-boy oranını hesaplar. Bu oran, Bitmap'in yatay (landscape) veya dikey (portrait) olduğunu belirlemek için kullanılacak.
+
+6->bitmapRatio 1'den büyükse, orijinal Bitmap yatay (landscape) olarak kabul edilir.
+Bu durumda, width değeri maximumSize olarak ayarlanır ve scaledHeight değişkeni aracılığıyla buna bağlı olarak height değeri yeniden boyutlandırılır.
+
+7->bitmapRatio 1'den küçükse, orijinal Bitmap dikey (portrait) olarak kabul edilir. Bu durumda, height değeri maximumSize olarak ayarlanır ve
+ scaledWidth değişkeni aracılığıyla buna bağlı olarak width değeri yeniden boyutlandırılır.
+
+8>Son olarak, Bitmap.createScaledBitmap işlevi kullanılarak orijinal Bitmap nesnesi belirlenen boyutlara yeniden boyutlandırılır ve küçültülen Bitmap döndürülür.
+ */
 
 
