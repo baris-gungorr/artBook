@@ -20,8 +20,16 @@ class ArtHolder(val binding: RecyclerRowBinding): RecyclerView.ViewHolder(bindin
         return artList.size
     }
 
+    fun updateData(newArtList: ArrayList<Art>) {
+     var   artList = newArtList
+        notifyDataSetChanged()
+        artList.sortBy { it.name }
+    }
     override fun onBindViewHolder(holder: ArtHolder, position: Int) {
-        holder.binding.recyclerViewTextView.text = artList.get(position).name
+        val art = artList[position]
+        val displayText = "${position + 1}-${art.name}"
+        holder.binding.recyclerViewTextView.text = displayText
+
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context,DetailsActivity::class.java)
             intent.putExtra("info","old")

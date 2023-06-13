@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -85,8 +86,10 @@ class DetailsActivity : AppCompatActivity() {
         val artistName = binding.artistNameText.text.toString()
         val year = binding.yearText.text.toString()
 
+
         if (selectedBitmap != null) {
             val smallBitMap = makeSmallerBitMap(selectedBitmap!!,300)
+
 
             val outPutStream = ByteArrayOutputStream()
             smallBitMap.compress(Bitmap.CompressFormat.PNG,50,outPutStream)   //görseli byteDizisine çevirmek
@@ -195,11 +198,14 @@ class DetailsActivity : AppCompatActivity() {
             width = maximumSize
             val scaledHeight = width / bitmapRatio
             height = scaledHeight.toInt()
-        }else{
+        }else if (bitmapRatio < 1){
             //portrait
             height = maximumSize
             val scaledWidth = height * bitmapRatio
             width = scaledWidth.toInt()
+        }else{
+            width =maximumSize
+            height = maximumSize
         }
 
         return Bitmap.createScaledBitmap(image,width,height,true)
